@@ -35,7 +35,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         message: "Event Creation Failed",
-        error: e instanceof Error ? e.message : "unknown",
+        ...(process.env.NODE_ENV === "development"
+          ? {
+              error: e instanceof Error ? e.message : "unknown",
+            }
+          : {}),
       },
       { status: 500 }
     );
