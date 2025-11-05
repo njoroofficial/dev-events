@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
     }
 
     // get uploaded files
-    const file = formData.get("image") as File;
+    const file = formData.get("image");
 
-    if (!file) {
+    if (!(file instanceof File) || file.size === 0) {
       return NextResponse.json(
         { message: "Image file is required" },
         { status: 400 }
