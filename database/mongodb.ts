@@ -14,9 +14,6 @@ declare global {
 
 /**
  * MongoDB connection URI from environment variables
- * Make sure to add MONGODB_URI to your .env.local file
- * Example: MONGODB_URI=mongodb://localhost:27017/your-database
- * or: MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
  */
 const MONGODB_URI: string = (() => {
   const uri = process.env.MONGODB_URI;
