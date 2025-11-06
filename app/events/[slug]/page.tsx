@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/actions/events";
 import Image from "next/image";
+import BookEvent from "@/components/BookEvent";
 
 const EventDetailItem = ({
   icon,
@@ -64,6 +65,8 @@ const EventDetails = async ({
   }
 
   const event = result.data;
+
+  const bookings = 10;
 
   return (
     <section id="event">
@@ -133,7 +136,19 @@ const EventDetails = async ({
         {/* right side - booking form */}
 
         <aside className="booking">
-          <p className="text-lg font-semibold">Book Event</p>
+          <div className="signup-card">
+            <h2>Book Your Spot</h2>
+
+            {bookings > 0 ? (
+              <p className="text-sm">
+                Join {bookings} people who have already booked their spot!
+              </p>
+            ) : (
+              <p className="text-sm">Be the first to book your spot!</p>
+            )}
+
+            <BookEvent />
+          </div>
         </aside>
       </div>
     </section>
