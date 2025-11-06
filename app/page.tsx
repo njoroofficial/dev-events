@@ -1,13 +1,25 @@
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
-import { IEvent } from "@/database";
-
-// get base url
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+import { getAllEvents } from "@/lib/actions/events";
 
 const Home = async () => {
-  const response = await fetch(`${BASE_URL}/api/events`);
-  const { events } = await response.json();
+  const result = await getAllEvents();
+
+  // Handle error state
+  if (!result.ok) {
+    return (
+      <section>
+        <h1 className="text-center">
+          The Hub for Every Dev <br /> Event You Can`t Miss
+        </h1>
+        <p className="text-center mt-5 text-red-500">
+          Failed to load events. Please try again later.
+        </p>
+      </section>
+    );
+  }
+
+  const { events } = result.data;
 
   return (
     <section>
@@ -25,13 +37,15 @@ const Home = async () => {
         <h3>Featured Events</h3>
 
         <ul className="events">
-          {events &&
-            events.length > 0 &&
-            events.map((event: IEvent) => (
-              <li key={event.title}>
+          {events && events.length > 0 ? (
+            events.map((event) => (
+              <li key={event._id}>
                 <EventCard {...event} />
               </li>
-            ))}
+            ))
+          ) : (
+            <li className="text-center text-gray-500">No events available</li>
+          )}
         </ul>
       </div>
     </section>
