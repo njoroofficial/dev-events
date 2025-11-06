@@ -130,7 +130,7 @@ const EventDetails = async ({
               label={event.time}
             />
             <EventDetailItem
-              icon="/icons/location.svg"
+              icon="/icons/pin.svg"
               alt="location"
               label={event.location}
             />

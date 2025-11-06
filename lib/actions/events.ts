@@ -22,24 +22,18 @@ import {
 
 /**
  * Configure Cloudinary
- * Ensure environment variables are set
+ * Uses CLOUDINARY_URL which contains all configuration
+ * Format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
  */
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// Validate Cloudinary configuration
-if (
-  !process.env.CLOUDINARY_CLOUD_NAME ||
-  !process.env.CLOUDINARY_API_KEY ||
-  !process.env.CLOUDINARY_API_SECRET
-) {
+if (!process.env.CLOUDINARY_URL) {
   throw new Error(
-    "Missing Cloudinary environment variables. Please check CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET."
+    "Missing CLOUDINARY_URL environment variable. Please check your .env file."
   );
 }
+
+cloudinary.config({
+  cloudinary_url: process.env.CLOUDINARY_URL,
+});
 
 /**
  * Utility: Transform Mongoose document to EventDTO

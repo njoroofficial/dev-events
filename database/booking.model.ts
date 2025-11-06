@@ -22,7 +22,7 @@ const BookingSchema = new Schema<IBooking>(
       type: Schema.Types.ObjectId,
       ref: "Event",
       required: [true, "Event ID is required"],
-      index: true, // Index for faster queries
+      // Note: index removed here as it's defined below using schema.index()
     },
     email: {
       type: String,
@@ -75,10 +75,8 @@ BookingSchema.pre("save", async function (next) {
   next();
 });
 
-// Create index on eventId for optimized queries
-BookingSchema.index({ eventId: 1 });
-
 // Composite index for querying bookings by event and email
+// Note: This composite index also serves single-field queries on eventId (leftmost prefix)
 BookingSchema.index({ eventId: 1, email: 1 });
 
 /**
