@@ -152,6 +152,55 @@ export const getEventBySlug = cache(
 );
 
 /**
+ * Get similar events by slag
+ * Retrieves a similar events by its slug
+ */
+
+export const getSimilarEventsBySlug = cache(
+  async (slug: string): Promise<ActionResult<EventsListDTO>> => {
+    try {
+      // Validate and normalize slug
+      const validatedSlug = slugSchema.parse(slug.toLowerCase().trim());
+
+      await connectDB();
+
+      const event = await Event.findOne({ slug: validatedSlug }).lean().exec();
+      const similarEvents = await Event.find({
+        _id: { $ne: event?._id },
+        tags: { $in: event?.tags },
+      }).lean();
+
+      const eventDTOs = similarEvents.map(toEventDTO);
+
+      return {
+        ok: true,
+        data: {
+          events: eventDTOs,
+          total: eventDTOs.length,
+        },
+      };
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return {
+          ok: false,
+          code: "VALIDATION_ERROR",
+          message: "Invalid slug format",
+          issues: error.issues,
+        };
+      }
+
+      console.error("[getEventBySlug] Error:", error);
+
+      return {
+        ok: false,
+        code: "UNKNOWN",
+        message: "Failed to fetch event",
+      };
+    }
+  }
+);
+
+/**
  * Upload Image to Cloudinary
  * Internal helper for image upload
  *

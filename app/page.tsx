@@ -39,7 +39,7 @@ const Home = async () => {
         <ul className="events">
           {events && events.length > 0 ? (
             events.map((event) => (
-              <li key={event._id}>
+              <li key={event._id} className="list-none">
                 <EventCard {...event} />
               </li>
             ))
