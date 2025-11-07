@@ -48,12 +48,8 @@ const EventTags = ({ tags }: { tags: string[] }) => (
   </div>
 );
 
-const EventDetails = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
-  const { slug } = await params;
+// Separate async component for event content
+const EventContent = async ({ slug }: { slug: string }) => {
   const result = await getEventBySlug(slug);
 
   // Handle not found
@@ -63,37 +59,18 @@ const EventDetails = async ({
     }
     // Handle other errors
     return (
-      <section id="event">
+      <div>
         <h1>Error</h1>
         <p className="text-red-500">{result.message}</p>
-      </section>
+      </div>
     );
   }
 
   const event = result.data;
-
-  // get similar events
-  const similarEvents = await getSimilarEventsBySlug(slug);
-  // Handle not found
-  if (!similarEvents.ok) {
-    if (similarEvents.code === "NOT_FOUND") {
-      notFound();
-    }
-    // Handle other errors
-    return (
-      <section id="event">
-        <h1>Error</h1>
-        <p className="text-red-500">{similarEvents.message}</p>
-      </section>
-    );
-  }
-  // destructure similar events
-  const { events: allSimilarEvents, total } = similarEvents.data;
-
   const bookings = 10;
 
   return (
-    <section id="event">
+    <>
       <div className="header">
         <h1>Event Description</h1>
 
@@ -175,19 +152,63 @@ const EventDetails = async ({
           </div>
         </aside>
       </div>
+    </>
+  );
+};
 
-      <div className="flex w-full flex-col gap-4 pt-20">
-        <h2>Similar Events</h2>
+// Separate async component for similar events
+const SimilarEvents = async ({ slug }: { slug: string }) => {
+  const similarEvents = await getSimilarEventsBySlug(slug);
 
-        <div className="events">
-          {total > 0 &&
-            allSimilarEvents.map((similarEvent) => (
-              <Suspense fallback={<h1>Loading ... </h1>}>
-                <EventCard key={similarEvent._id} {...similarEvent} />
-              </Suspense>
-            ))}
-        </div>
+  // Handle not found
+  if (!similarEvents.ok) {
+    if (similarEvents.code === "NOT_FOUND") {
+      return null;
+    }
+    // Handle other errors
+    return (
+      <div>
+        <p className="text-red-500">{similarEvents.message}</p>
       </div>
+    );
+  }
+
+  // destructure similar events
+  const { events: allSimilarEvents, total } = similarEvents.data;
+
+  if (total === 0) {
+    return null;
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-4 pt-20">
+      <h2>Similar Events</h2>
+
+      <div className="events">
+        {allSimilarEvents.map((similarEvent) => (
+          <EventCard key={similarEvent._id} {...similarEvent} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const EventDetails = async ({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) => {
+  const { slug } = await params;
+
+  return (
+    <section id="event">
+      <Suspense fallback={<div>Loading event details...</div>}>
+        <EventContent slug={slug} />
+      </Suspense>
+
+      <Suspense fallback={<div>Loading similar events...</div>}>
+        <SimilarEvents slug={slug} />
+      </Suspense>
     </section>
   );
 };
