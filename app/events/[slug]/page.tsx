@@ -193,21 +193,32 @@ const SimilarEvents = async ({ slug }: { slug: string }) => {
   );
 };
 
+// Generate static params for all events
+export async function generateStaticParams() {
+  const result = await getAllEvents();
+
+  if (!result.ok) {
+    return [];
+  }
+
+  return result.data.events.map((event) => ({
+    slug: event.slug,
+  }));
+}
+
 const EventDetails = async ({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) => {
-  const { slug } = await params;
-
   return (
     <section id="event">
       <Suspense fallback={<div>Loading event details...</div>}>
-        <EventContent slug={slug} />
+        <EventContent slug={(await params).slug} />
       </Suspense>
 
       <Suspense fallback={<div>Loading similar events...</div>}>
-        <SimilarEvents slug={slug} />
+        <SimilarEvents slug={(await params).slug} />
       </Suspense>
     </section>
   );
