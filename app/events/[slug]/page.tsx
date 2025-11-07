@@ -7,6 +7,7 @@ import {
 import Image from "next/image";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
+import { Suspense } from "react";
 
 const EventDetailItem = ({
   icon,
@@ -181,7 +182,9 @@ const EventDetails = async ({
         <div className="events">
           {total > 0 &&
             allSimilarEvents.map((similarEvent) => (
-              <EventCard key={similarEvent._id} {...similarEvent} />
+              <Suspense fallback={<h1>Loading ... </h1>}>
+                <EventCard key={similarEvent._id} {...similarEvent} />
+              </Suspense>
             ))}
         </div>
       </div>
